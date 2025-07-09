@@ -4,6 +4,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa"
 import { Product } from '@/types/product';
 import { colors, products } from "../utils/store"
+import Image from 'next/image';
 
 // Helper function to get variant details
 const getVariantDetails = (product: Product, colorId: number | null) => {
@@ -41,19 +42,31 @@ export default function ProductGrid({ limit, products: overrideProducts }: { lim
   // Track selected color for each product using product_id as key
   const [selectedColors, setSelectedColors] = useState<Record<string, number>>(
     products.reduce((acc: Record<string, number>, product: Product) => {
-      // Initialize with first color or URL param if exists
-      const colorParam = searchParams.get(`color_${product.product_id}`);
-      acc[product.product_id] = colorParam ? 
-        Number(colorParam) : 
-        product.colors[0];
+      acc[product.product_id] = product.colors[0];
       return acc;
     }, {})
   );
+
+  // On mount, update selectedColors from searchParams (client-side only)
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    setSelectedColors(prev => {
+      const updated: Record<string, number> = { ...prev };
+      products.forEach(product => {
+        const colorParam = searchParams.get(`color_${product.product_id}`);
+        if (colorParam) {
+          updated[product.product_id] = Number(colorParam);
+        }
+      });
+      return updated;
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
   
   // Update URL when color changes
   useEffect(() => {
     Object.keys(selectedColors).forEach(productId => {
-      const params = new URLSearchParams(searchParams.toString());
+      const params = new URLSearchParams(searchParams?.toString() || '');
       params.set(`color_${productId}`, selectedColors[productId].toString());
       router.replace(`?${params.toString()}`, { scroll: false });
     });
@@ -89,7 +102,7 @@ export default function ProductGrid({ limit, products: overrideProducts }: { lim
     }));
     
     // Update URL with product-specific color param
-    const params = new URLSearchParams(searchParams.toString());
+    const params = new URLSearchParams(searchParams?.toString() || '');
     params.set(`color_${productId}`, colorId.toString());
     router.replace(`?${params.toString()}`, { scroll: false });
     
@@ -116,12 +129,15 @@ export default function ProductGrid({ limit, products: overrideProducts }: { lim
                 {/* Product Image Container */}
                 <div className="relative aspect-[3/4] bg-gray-100 mb-4 overflow-hidden">
                   {/* Main product image - shows variant image by default, carousel images when navigating */}
-                  <img
+                  <Image
                     src={currentImageIndices[product.product_id] === 0 ? 
                       variant.product_image : 
                       filteredImages[currentImageIndices[product.product_id]]?.product_image || variant.product_image}
                     alt={product.product_name}
+                    width={300}
+                    height={400}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    unoptimized
                   />
                   
                   {/* Navigation arrows - only show if there are multiple images */}

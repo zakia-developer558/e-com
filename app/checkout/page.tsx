@@ -1,5 +1,7 @@
 "use client";
 import { useState } from "react";
+import { CartItem } from "@/context/cartContext";
+import { Product } from "@/types/product";
 
 export default function CheckoutPage() {
   const [form, setForm] = useState({
@@ -25,13 +27,13 @@ export default function CheckoutPage() {
     setError("");
     try {
       // Get cart from localStorage
-      const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+      const cart: CartItem[] = JSON.parse(localStorage.getItem('cart') || '[]');
       // Map cart items to include readable names
       const { products, sizes, colors } = await import('@/utils/store');
-      const cartWithNames = cart.map((item: any) => {
-        const product = products.find((p: any) => p.product_id === item.productId);
-        const size = sizes.find((s: any) => s.id === item.sizeId);
-        const color = colors.find((c: any) => c.id === item.colorId);
+      const cartWithNames = cart.map((item: CartItem) => {
+        const product = products.find((p: Product) => p.product_id === item.productId);
+        const size = sizes.find((s: { id: number; name: string }) => s.id === item.sizeId);
+        const color = colors.find((c: { id: number; name: string; color: string }) => c.id === item.colorId);
         return {
           ...item,
           productName: product ? product.product_name : item.productId,
@@ -48,7 +50,7 @@ export default function CheckoutPage() {
       if (!res.ok) throw new Error('Failed to send email');
       setSubmitted(true);
       localStorage.removeItem('cart');
-    } catch (err) {
+    } catch {
       setError('Failed to send order. Please try again.');
     } finally {
       setLoading(false);

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import sgMail from '@sendgrid/mail';
+import { CartItem } from '@/context/cartContext';
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
 
@@ -11,7 +12,7 @@ export async function POST(req: NextRequest) {
     const userEmail = form.email;
 
     // Build order details as HTML
-    const cartHtml = cart.map((item: any, idx: number) => `
+    const cartHtml = (cart as (CartItem & { productName: string; sizeName: string; colorName: string; price: string })[]).map((item, idx: number) => `
       <tr>
         <td>${idx + 1}</td>
         <td>${item.productName}</td>

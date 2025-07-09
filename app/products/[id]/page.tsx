@@ -6,20 +6,22 @@ import { useState } from 'react';
 import { FaShoppingCart } from "react-icons/fa";
 import { useRouter } from 'next/navigation';
 import { useCart } from '@/context/cartContext';
+import Image from 'next/image';
 
 export default function ProductDetailPage() {
   const params = useParams();
   const id = Array.isArray(params.id) ? params.id[0] : params.id;
-  const product = products.find(p => p.product_id === id);
-  if (!product) return notFound();
-
   const router = useRouter();
   const { addToCart } = useCart();
-  const [selectedColor, setSelectedColor] = useState(product.colors[0]);
-  const [selectedSize, setSelectedSize] = useState(product.sizes[0]);
+  // Find product after hooks
+  const product = products.find(p => p.product_id === id);
+  const [selectedColor, setSelectedColor] = useState(product ? product.colors[0] : 0);
+  const [selectedSize, setSelectedSize] = useState(product ? product.sizes[0] : 0);
   const [currentImage, setCurrentImage] = useState(0);
   const [added, setAdded] = useState(false);
   const [quantity, setQuantity] = useState(1);
+
+  if (!product) return notFound();
 
   // Type guard to filter out undefined
   function isColorDefined(color: typeof colors[number] | undefined): color is typeof colors[number] {
@@ -34,12 +36,12 @@ export default function ProductDetailPage() {
         {/* Image Gallery */}
         <div className="flex flex-col gap-4">
           <div className="bg-gray-100 flex items-center justify-center h-105 rounded-lg overflow-hidden">
-            <img src={images[currentImage]?.product_image || product.product_image} alt={product.product_name} className="object-contain max-h-full max-w-full" />
+            <Image src={images[currentImage]?.product_image || product.product_image} alt={product.product_name} width={400} height={500} className="object-contain max-h-full max-w-full" unoptimized />
           </div>
           <div className="flex gap-2 mt-2">
             {images.map((img, idx) => (
               <button key={idx} onClick={() => setCurrentImage(idx)} className={`w-16 h-16 border ${currentImage === idx ? 'ring-2 ring-black' : ''}`}>
-                <img src={img.product_image} alt={product.product_name + ' thumbnail'} className="object-cover w-full h-full" />
+                <Image src={img.product_image} alt={product.product_name + ' thumbnail'} width={64} height={64} className="object-cover w-full h-full" unoptimized />
               </button>
             ))}
           </div>
@@ -130,10 +132,13 @@ export default function ProductDetailPage() {
             .map((related) => (
               <div key={related.product_id} className="border rounded-lg overflow-hidden hover:shadow-lg transition-shadow cursor-pointer" onClick={() => router.push(`/products/${related.product_id}`)}>
                 <div className="relative aspect-[3/4] bg-gray-100">
-                  <img
+                  <Image
                     src={related.product_image}
                     alt={related.product_name}
+                    width={300}
+                    height={400}
                     className="object-cover w-full h-full"
+                    unoptimized
                   />
                 </div>
                 <div className="p-4">

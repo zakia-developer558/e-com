@@ -1,6 +1,7 @@
 
 import Hero from "@/components/hero";
 import ProductGrid from "@/components/product";
+import { Suspense } from 'react';
 
 export default function Home() {
   return (
@@ -8,7 +9,9 @@ export default function Home() {
       
       <div className="flex-1">
         <Hero />
-        <ProductGrid limit={8} />
+        <Suspense fallback={<div>Loading products...</div>}>
+          <ProductGrid limit={8} />
+        </Suspense>
       </div>
       
     </main>

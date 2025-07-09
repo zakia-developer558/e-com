@@ -46,7 +46,7 @@ export default function CartDrawer({ open, onClose }: { open: boolean; onClose: 
               if (!product) return null;
               return (
                 <div key={idx} className="flex items-center gap-4 border-b pb-4">
-                  <img src={product.product_image} alt={product.product_name} className="w-16 h-16 object-cover rounded" />
+                  <Image src={product.product_image} alt={product.product_name} width={64} height={64} className="w-16 h-16 object-cover rounded" unoptimized />
                   <div className="flex-1">
                     <div className="font-medium text-lg">{product.product_name}</div>
                     <div className="text-sm text-gray-500">{colorObj ? colorObj.name : ''} {sizeObj ? `| ${sizeObj.name}` : ''}</div>
