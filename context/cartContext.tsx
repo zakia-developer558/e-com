@@ -12,6 +12,7 @@ type CartContextType = {
   cart: CartItem[];
   addToCart: (item: CartItem) => void;
   removeFromCart: (item: { productId: string; colorId: number; sizeId: number }) => void;
+  clearCart: () => void; // Added this line
   cartCount: number;
 };
 
@@ -53,10 +54,22 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     ));
   };
 
+  // Added this function
+  const clearCart = () => {
+    setCart([]);
+    localStorage.removeItem('cart');
+  };
+
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
-    <CartContext.Provider value={{ cart, addToCart, removeFromCart, cartCount }}>
+    <CartContext.Provider value={{ 
+      cart, 
+      addToCart, 
+      removeFromCart, 
+      clearCart, // Added this line
+      cartCount 
+    }}>
       {children}
     </CartContext.Provider>
   );
@@ -66,4 +79,4 @@ export const useCart = () => {
   const ctx = useContext(CartContext);
   if (!ctx) throw new Error('useCart must be used within a CartProvider');
   return ctx;
-}; 
+};
