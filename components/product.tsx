@@ -32,6 +32,26 @@ type ProductGridProps = {
   view?: 'grid' | 'list';
 };
 
+type ProductCardProps = {
+  product: Product;
+  selectedColor: number;
+  currentImageIndex: number;
+  onColorSelect: (colorId: number, productId: string) => void;
+  onPrevImage: (productId: string, imagesLength: number) => void;
+  onNextImage: (productId: string, imagesLength: number) => void;
+  router: ReturnType<typeof useRouter>;
+};
+
+type ProductListItemProps = {
+  product: Product;
+  selectedColor: number;
+  currentImageIndex: number;
+  onColorSelect: (colorId: number, productId: string) => void;
+  onPrevImage: (productId: string, imagesLength: number) => void;
+  onNextImage: (productId: string, imagesLength: number) => void;
+  router: ReturnType<typeof useRouter>;
+};
+
 export default function ProductGrid({ 
   limit, 
   products: overrideProducts, 
@@ -67,7 +87,6 @@ export default function ProductGrid({
       });
       return updated;
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams]);
   
   // Update URL when color changes
@@ -78,14 +97,6 @@ export default function ProductGrid({
       router.replace(`?${params.toString()}`, { scroll: false });
     });
   }, [selectedColors, router, searchParams]);
-
-  const getFilteredImages = (product: Product) => {
-    const selectedColor = selectedColors[product.product_id];
-    if (!selectedColor) return product.images;
-    return product.images.filter(img => 
-      !img.color_id || img.color_id === selectedColor
-    );
-  };
 
   const nextImage = (productId: string, imagesLength: number) => {
     setCurrentImageIndices(prev => ({
@@ -159,7 +170,6 @@ export default function ProductGrid({
   )
 }
 
-// Product Card Component for Grid View
 const ProductCard = ({ 
   product, 
   selectedColor, 
@@ -168,15 +178,7 @@ const ProductCard = ({
   onPrevImage, 
   onNextImage, 
   router 
-}: {
-  product: Product;
-  selectedColor: number;
-  currentImageIndex: number;
-  onColorSelect: (colorId: number, productId: string) => void;
-  onPrevImage: (productId: string, imagesLength: number) => void;
-  onNextImage: (productId: string, imagesLength: number) => void;
-  router: any;
-}) => {
+}: ProductCardProps) => {
   const variant = getVariantDetails(product, selectedColor);
   const filteredImages = product.images.filter(img => 
     !img.color_id || img.color_id === selectedColor
@@ -187,7 +189,6 @@ const ProductCard = ({
       className="group cursor-pointer" 
       onClick={() => router.push(`/products/${product.product_id}`)}
     >
-      {/* Image Container */}
       <div className="relative aspect-[3/4] bg-gray-100 mb-4 overflow-hidden">
         <Image
           src={currentImageIndex === 0 ? 
@@ -226,7 +227,6 @@ const ProductCard = ({
         )}
       </div>
 
-      {/* Product Info */}
       <div className="space-y-2">
         <h3 className="text-sm font-medium text-gray-900 leading-tight">{product.product_name}</h3>
         <p className="text-sm text-gray-900 font-medium">
@@ -238,7 +238,6 @@ const ProductCard = ({
           )}
         </p>
 
-        {/* Color Swatches */}
         <div className="flex gap-2 pt-1">
           {product.colors.map((colorId) => {
             const color = colors.find(c => c.id === colorId);
@@ -263,7 +262,6 @@ const ProductCard = ({
   );
 };
 
-// Product List Item Component for List View
 const ProductListItem = ({ 
   product, 
   selectedColor, 
@@ -272,15 +270,7 @@ const ProductListItem = ({
   onPrevImage, 
   onNextImage, 
   router 
-}: {
-  product: Product;
-  selectedColor: number;
-  currentImageIndex: number;
-  onColorSelect: (colorId: number, productId: string) => void;
-  onPrevImage: (productId: string, imagesLength: number) => void;
-  onNextImage: (productId: string, imagesLength: number) => void;
-  router: any;
-}) => {
+}: ProductListItemProps) => {
   const variant = getVariantDetails(product, selectedColor);
   const filteredImages = product.images.filter(img => 
     !img.color_id || img.color_id === selectedColor
@@ -291,7 +281,6 @@ const ProductListItem = ({
       className="flex flex-col sm:flex-row gap-6 group cursor-pointer border-b pb-8"
       onClick={() => router.push(`/products/${product.product_id}`)}
     >
-      {/* Image Container */}
       <div className="relative w-full sm:w-1/3 aspect-[4/5] bg-gray-100 overflow-hidden">
         <Image
           src={currentImageIndex === 0 ? 
@@ -330,7 +319,6 @@ const ProductListItem = ({
         )}
       </div>
 
-      {/* Product Info */}
       <div className="w-full sm:w-2/3 flex flex-col justify-center">
         <h3 className="text-lg font-medium text-gray-900 mb-2">{product.product_name}</h3>
         <p className="text-lg text-gray-900 font-medium mb-4">
@@ -346,7 +334,6 @@ const ProductListItem = ({
           {product.description || 'No description available'}
         </p>
 
-        {/* Color Swatches */}
         <div className="flex gap-2">
           {product.colors.map((colorId) => {
             const color = colors.find(c => c.id === colorId);

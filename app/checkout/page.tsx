@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { CartItem } from "@/context/cartContext";
 import { Product } from "@/types/product";
 import { useCart } from "@/context/cartContext";
