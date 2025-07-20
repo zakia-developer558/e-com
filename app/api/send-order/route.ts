@@ -8,7 +8,7 @@ export async function POST(req: NextRequest) {
   try {
     const { form, cart } = await req.json();
     const adminEmail = process.env.ADMIN_EMAIL!;
-    const fromEmail = process.env.FROM_EMAIL!;
+    const fromEmail = process.env.ORDER_FROM_EMAIL!;
     const userEmail = form.email;
 
     // Build order details as HTML

@@ -8,7 +8,7 @@ const products: Product[] = [
     product_number: "1001",
     barcode: "",
     colors: [6, 7],
-    sizes: [1, 2, 3],
+    sizes: [1],
     description:
       "kjemmet bomullsgarn som puster og abosrberer godt.\n100 % bomull\n\nvedlikehold:\nmaskinvask 60°C. vaskes sammen med lignende farger. tørkes flatt.\n(kan krympes litt i vask, så ville ha gått noe lavere i tempen)",
     webshop_description: "",
@@ -73,7 +73,7 @@ const products: Product[] = [
     product_number: "1001",
     barcode: "",
     colors: [4, 6],
-    sizes: [1, 2, 3],
+    sizes: [2],
     description:
       "kjemmet bomullsgarn som puster og abosrberer godt.\n100 % bomull\n\nvedlikehold:\nmaskinvask 60°C. vaskes sammen med lignende farger. tørkes flatt.\n(kan krympes litt i vask, så ville ha gått noe lavere i tempen)",
     webshop_description: "",
@@ -131,7 +131,7 @@ const products: Product[] = [
     product_number: "1001",
     barcode: "",
     colors: [7,8],
-    sizes: [1, 2, 3],
+    sizes: [ 3],
     description:
       "kjemmet bomullsgarn som puster og abosrberer godt.\n100 % bomull\n\nvedlikehold:\nmaskinvask 60°C. vaskes sammen med lignende farger. tørkes flatt.\n(kan krympes litt i vask, så ville ha gått noe lavere i tempen)",
     webshop_description: "",
@@ -190,7 +190,7 @@ const products: Product[] = [
     product_number: "1001",
     barcode: "",
     colors: [ 3, 6],
-    sizes: [1, 2, 3],
+    sizes: [4],
     description:
       "kjemmet bomullsgarn som puster og abosrberer godt.\n100 % bomull\n\nvedlikehold:\nmaskinvask 60°C. vaskes sammen med lignende farger. tørkes flatt.\n(kan krympes litt i vask, så ville ha gått noe lavere i tempen)",
     webshop_description: "",
@@ -248,7 +248,7 @@ const products: Product[] = [
     product_number: "1001",
     barcode: "",
     colors: [9],
-    sizes: [1, 2, 3],
+    sizes: [5],
     description:
       "kjemmet bomullsgarn som puster og abosrberer godt.\n100 % bomull\n\nvedlikehold:\nmaskinvask 60°C. vaskes sammen med lignende farger. tørkes flatt.\n(kan krympes litt i vask, så ville ha gått noe lavere i tempen)",
     webshop_description: "",
@@ -301,7 +301,7 @@ const products: Product[] = [
     product_number: "1001",
     barcode: "",
     colors: [10],
-    sizes: [1, 2, 3, 4],
+    sizes: [ 6],
     description:
       "kjemmet bomullsgarn som puster og abosrberer godt.\n100 % bomull\n\nvedlikehold:\nmaskinvask 60°C. vaskes sammen med lignende farger. tørkes flatt.\n(kan krympes litt i vask, så ville ha gått noe lavere i tempen)",
     webshop_description: "",
@@ -355,7 +355,7 @@ const products: Product[] = [
     product_number: "1001",
     barcode: "",
     colors: [9],
-    sizes: [1, 2, 3],
+    sizes: [3],
     description:
       "kjemmet bomullsgarn som puster og abosrberer godt.\n100 % bomull\n\nvedlikehold:\nmaskinvask 60°C. vaskes sammen med lignende farger. tørkes flatt.\n(kan krympes litt i vask, så ville ha gått noe lavere i tempen)",
     webshop_description: "",
@@ -473,7 +473,7 @@ const products: Product[] = [
     product_number: "1001",
     barcode: "",
     colors: [6, 7],
-    sizes: [1, 2, 3],
+    sizes: [3],
     description:
       "kjemmet bomullsgarn som puster og abosrberer godt.\n100 % bomull\n\nvedlikehold:\nmaskinvask 60°C. vaskes sammen med lignende farger. tørkes flatt.\n(kan krympes litt i vask, så ville ha gått noe lavere i tempen)",
     webshop_description: "",

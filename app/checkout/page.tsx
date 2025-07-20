@@ -5,6 +5,7 @@ import { Product } from "@/types/product";
 import { useCart } from "@/context/cartContext";
 import { products, sizes, colors } from "@/utils/store";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function CheckoutPage() {
   const { cart, clearCart } = useCart();
@@ -74,9 +75,34 @@ export default function CheckoutPage() {
       <h1 className="text-3xl font-bold mb-8">Checkout</h1>
       
       {submitted ? (
-        <div className="bg-green-100 text-green-800 p-6 rounded-lg text-center font-medium">
-          Thank you for your order! We will contact you soon.
-        </div>
+         <div className="max-w-md mx-auto bg-green-50 border border-green-200 rounded-xl p-8 text-center shadow-lg">
+         <div className="inline-flex items-center justify-center w-20 h-20 bg-green-100 rounded-full mb-6">
+           <svg 
+             xmlns="http://www.w3.org/2000/svg" 
+             className="h-10 w-10 text-green-600" 
+             fill="none" 
+             viewBox="0 0 24 24" 
+             stroke="currentColor"
+           >
+             <path 
+               strokeLinecap="round" 
+               strokeLinejoin="round" 
+               strokeWidth={2} 
+               d="M5 13l4 4L19 7" 
+             />
+           </svg>
+         </div>
+         <h3 className="text-2xl font-bold text-green-800 mb-2">Order Confirmed!</h3>
+         <p className="text-lg text-green-700 mb-6">
+  Thank you for your order. We&apos;ve received it and will contact you soon.
+</p>
+         <Link 
+           href="/products" 
+           className="inline-block px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors"
+         >
+           Continue Shopping
+         </Link>
+       </div>
       ) : (
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Order Summary */}

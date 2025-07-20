@@ -113,45 +113,46 @@ export default function Header() {
           </div>
           {/* Search Dropdown (works on both mobile and desktop) */}
           {searchOpen && (
-            <div
-              id="search-dropdown"
-              className="z-50"
-              style={{ position: 'fixed', left: 0, right: 0, top: '4rem', width: '100%' }}
-            >
-              <div className="mx-auto max-w-md md:max-w-none md:w-80 md:absolute md:right-24 md:top-0 md:left-auto md:mx-0 md:rounded md:shadow-lg md:border bg-white border rounded shadow-lg p-4">
-                <input
-                  autoFocus
-                  type="text"
-                  value={search}
-                  onChange={e => setSearch(e.target.value)}
-                  placeholder="Search products by name..."
-                  className="w-full border rounded px-3 py-2 mb-2"
-                />
-                {search && (
-                  <ul className="max-h-60 overflow-y-auto divide-y">
-                    {filtered.length === 0 ? (
-                      <li className="p-2 text-gray-500">No products found.</li>
-                    ) : (
-                      filtered.map(p => (
-                        <li key={p.product_id}>
-                          <button
-                            className="w-full text-left p-2 hover:bg-gray-100 rounded"
-                            onClick={() => {
-                              setSearchOpen(false);
-                              setSearch("");
-                              router.push(`/products/${p.product_id}`);
-                            }}
-                          >
-                            {p.product_name}
-                          </button>
-                        </li>
-                      ))
-                    )}
-                  </ul>
-                )}
-              </div>
-            </div>
-          )}
+  <div
+    id="search-dropdown"
+    className="z-50 absolute left-0 right-0 top-full "
+  >
+    <div className="container mx-auto px-4 sm:px-6 py-4">
+      <div className="max-w-md md:max-w-none md:w-80 md:ml-auto">
+        <input
+          autoFocus
+          type="text"
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          placeholder="Search products by name..."
+          className="w-full border rounded px-3 py-2 mb-2"
+        />
+        {search && (
+          <ul className="max-h-60 overflow-y-auto divide-y">
+            {filtered.length === 0 ? (
+              <li className="p-2 text-gray-500">No products found.</li>
+            ) : (
+              filtered.map(p => (
+                <li key={p.product_id}>
+                  <button
+                    className="w-full text-left p-2 hover:bg-gray-100 rounded"
+                    onClick={() => {
+                      setSearchOpen(false);
+                      setSearch("");
+                      router.push(`/products/${p.product_id}`);
+                    }}
+                  >
+                    {p.product_name}
+                  </button>
+                </li>
+              ))
+            )}
+          </ul>
+        )}
+      </div>
+    </div>
+  </div>
+)}
           {/* Mobile Slide Menu */}
           <Fragment>
             <div className={`fixed inset-0 z-40 bg-black/30 transition-opacity duration-300 ${mobileNavOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`} onClick={() => setMobileNavOpen(false)} />

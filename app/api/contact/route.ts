@@ -7,7 +7,7 @@ export async function POST(req: NextRequest) {
   try {
     const { name, email, phone, comment } = await req.json();
     const adminEmail = process.env.ADMIN_EMAIL!;
-    const fromEmail = process.env.FROM_EMAIL!;
+    const fromEmail = process.env.CONTACT_FROM_EMAIL!;
 
     const html = `
       <h2>Contact Form Submission</h2>

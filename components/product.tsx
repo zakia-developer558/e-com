@@ -2,9 +2,11 @@
 import { useState, useEffect } from "react"
 import { useRouter, useSearchParams } from 'next/navigation';
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa"
+import { FiShoppingBag } from "react-icons/fi"
 import { Product } from '@/types/product';
 import { colors, products } from "../utils/store"
 import Image from 'next/image';
+import { useCart } from "@/context/cartContext";
 
 // Helper function to get variant details
 const getVariantDetails = (product: Product, colorId: number | null) => {
@@ -179,16 +181,38 @@ const ProductCard = ({
   onNextImage, 
   router 
 }: ProductCardProps) => {
+  const { addToCart } = useCart();
   const variant = getVariantDetails(product, selectedColor);
   const filteredImages = product.images.filter(img => 
     !img.color_id || img.color_id === selectedColor
   );
 
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    addToCart({
+      productId: product.product_id,
+      colorId: selectedColor,
+      sizeId: product.sizes[0],
+      quantity: 1
+    });
+  };
+
   return (
     <div 
-      className="group cursor-pointer" 
+      className="group cursor-pointer relative hover:shadow-lg transition-shadow duration-200 rounded-lg overflow-hidden" 
       onClick={() => router.push(`/products/${product.product_id}`)}
     >
+      {/* Floating Add to Cart Button */}
+      <button
+        onClick={handleAddToCart}
+        className="absolute top-3 right-3 z-10 bg-white/90 hover:bg-white rounded-full p-2 shadow-md transition-all opacity-0 group-hover:opacity-100 hover:scale-110"
+        aria-label="Add to cart"
+        title="Add to cart"
+      >
+        <FiShoppingBag className="w-4 h-4 text-gray-900" />
+      </button>
+
+      {/* Image Container */}
       <div className="relative aspect-[3/4] bg-gray-100 mb-4 overflow-hidden">
         <Image
           src={currentImageIndex === 0 ? 
@@ -227,7 +251,8 @@ const ProductCard = ({
         )}
       </div>
 
-      <div className="space-y-2">
+      {/* Product Info */}
+      <div className="p-4 space-y-2">
         <h3 className="text-sm font-medium text-gray-900 leading-tight">{product.product_name}</h3>
         <p className="text-sm text-gray-900 font-medium">
           {variant.price_inc_vat} NOK
@@ -238,6 +263,7 @@ const ProductCard = ({
           )}
         </p>
 
+        {/* Color Swatches */}
         <div className="flex gap-2 pt-1">
           {product.colors.map((colorId) => {
             const color = colors.find(c => c.id === colorId);
@@ -257,6 +283,8 @@ const ProductCard = ({
             );
           })}
         </div>
+
+       
       </div>
     </div>
   );
@@ -271,17 +299,39 @@ const ProductListItem = ({
   onNextImage, 
   router 
 }: ProductListItemProps) => {
+  const { addToCart } = useCart();
   const variant = getVariantDetails(product, selectedColor);
   const filteredImages = product.images.filter(img => 
     !img.color_id || img.color_id === selectedColor
   );
 
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    addToCart({
+      productId: product.product_id,
+      colorId: selectedColor,
+      sizeId: product.sizes[0],
+      quantity: 1
+    });
+  };
+
   return (
     <div 
-      className="flex flex-col sm:flex-row gap-6 group cursor-pointer border-b pb-8"
+      className="flex flex-col sm:flex-row gap-6 group cursor-pointer border-b pb-8 relative hover:bg-gray-50/50 transition-colors duration-200 p-4 rounded-lg"
       onClick={() => router.push(`/products/${product.product_id}`)}
     >
-      <div className="relative w-full sm:w-1/3 aspect-[4/5] bg-gray-100 overflow-hidden">
+      {/* Floating Add to Cart Button */}
+      <button
+        onClick={handleAddToCart}
+        className="absolute top-3 right-3 z-10 bg-white/90 hover:bg-white rounded-full p-2 shadow-md transition-all opacity-0 group-hover:opacity-100 hover:scale-110"
+        aria-label="Add to cart"
+        title="Add to cart"
+      >
+        <FiShoppingBag className="w-4 h-4 text-gray-900" />
+      </button>
+
+      {/* Image Container */}
+      <div className="relative w-full sm:w-1/3 aspect-[4/5] bg-gray-100 overflow-hidden rounded-lg">
         <Image
           src={currentImageIndex === 0 ? 
             variant.product_image : 
@@ -319,6 +369,7 @@ const ProductListItem = ({
         )}
       </div>
 
+      {/* Product Info */}
       <div className="w-full sm:w-2/3 flex flex-col justify-center">
         <h3 className="text-lg font-medium text-gray-900 mb-2">{product.product_name}</h3>
         <p className="text-lg text-gray-900 font-medium mb-4">
@@ -334,7 +385,8 @@ const ProductListItem = ({
           {product.description || 'No description available'}
         </p>
 
-        <div className="flex gap-2">
+        {/* Color Swatches */}
+        <div className="flex gap-2 mb-4">
           {product.colors.map((colorId) => {
             const color = colors.find(c => c.id === colorId);
             if (!color) return null;
