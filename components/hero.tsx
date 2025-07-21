@@ -1,5 +1,5 @@
 import Link from "next/link"
-
+//hero section
 export default function Hero() {
   return (
     <section className="relative w-full h-[60vh]">
