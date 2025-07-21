@@ -1,18 +1,10 @@
 "use client";
 import ProductGrid from '@/components/product';
 import { useState, useRef, Suspense } from 'react';
-import { products, colors, sizes } from '@/utils/store';
+import { products, colors } from '@/utils/store';
 import { FaChevronDown, FaThLarge, FaBars } from 'react-icons/fa';
 import { useEffect } from 'react';
-const getUniqueCategories = () => {
-  const cats: { id: string, name: string }[] = [];
-  products.forEach(p => {
-    if (!cats.find(c => c.id === p.category_id)) {
-      cats.push({ id: p.category_id, name: p.category_name });
-    }
-  });
-  return cats;
-};
+
 
 const sortOptions = [
   { value: 'newest', label: 'Date, new to old' },
@@ -25,20 +17,18 @@ const sortOptions = [
 
 export default function ProductsPage() {
   const [sort, setSort] = useState('newest');
-  const [category, setCategory] = useState('');
-  const [color, setColor] = useState('');
-  const [size, setSize] = useState('');
+  const [stock, setStock] = useState('');
+  const [showStock, setShowStock] = useState(false);
+  const [color, setColor] = useState<string[]>([]);
   const [view, setView] = useState<'grid' | 'list'>('grid');
-  const [showCategory, setShowCategory] = useState(false);
   const [showColor, setShowColor] = useState(false);
-  const [showSize, setShowSize] = useState(false);
   const sortRef = useRef<HTMLDivElement>(null);
 
   // Filtering
   let filtered = products;
-  if (category) filtered = filtered.filter(p => p.category_id === category);
-  if (color) filtered = filtered.filter(p => p.colors.includes(Number(color)));
-  if (size) filtered = filtered.filter(p => p.sizes.includes(Number(size)));
+  if (stock === 'in') filtered = filtered.filter(p => p.in_stock);
+  if (stock === 'out') filtered = filtered.filter(p => !p.in_stock);
+  if (color.length > 0) filtered = filtered.filter(p => p.colors.some(c => color.includes(String(c))));
 
   // Sorting
   if (sort === 'price-asc') filtered = [...filtered].sort((a, b) => Number(a.price_inc_vat.replace(/[^\d.]/g, '')) - Number(b.price_inc_vat.replace(/[^\d.]/g, '')));
@@ -48,14 +38,11 @@ export default function ProductsPage() {
   if (sort === 'newest') filtered = [...filtered].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
   if (sort === 'oldest') filtered = [...filtered].sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
 
-  const categories = getUniqueCategories();
-
   // Close dropdowns when clicking outside
   const handleClickOutside = (e: MouseEvent) => {
     if (sortRef.current && !sortRef.current.contains(e.target as Node)) {
-      setShowCategory(false);
+      setShowStock(false);
       setShowColor(false);
-      setShowSize(false);
     }
   };
 
@@ -73,45 +60,51 @@ export default function ProductsPage() {
       <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
         {/* Filters */}
         <div className="flex gap-2 flex-wrap items-center">
-          {/* Category Dropdown */}
+          {/* Stock Dropdown */}
           <div className="relative" ref={sortRef}>
             <button 
               className="flex items-center gap-2 px-3 py-2 border rounded bg-white min-w-[120px] hover:bg-gray-50 transition-colors" 
               onClick={(e) => {
                 e.stopPropagation();
-                setShowCategory(!showCategory);
+                setShowStock(!showStock);
                 setShowColor(false);
-                setShowSize(false);
               }}
             >
-              {category ? categories.find(c => c.id === category)?.name || 'Category' : 'Category'}
-              <FaChevronDown className={`w-3 h-3 transition-transform ${showCategory ? 'rotate-180' : ''}`} />
+              {stock === 'in' ? 'In Stock' : stock === 'out' ? 'Out of Stock' : 'Stock'}
+              <FaChevronDown className={`w-3 h-3 transition-transform ${showStock ? 'rotate-180' : ''}`} />
             </button>
-            {showCategory && (
-              <div className="absolute left-0 top-10 mt-1 border rounded bg-white shadow-lg min-w-[160px] z-20 max-h-60 overflow-y-auto">
+            {showStock && (
+              <div className="absolute left-0 top-10 mt-1 border rounded bg-white shadow-lg min-w-[160px] z-20">
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    setCategory('');
-                    setShowCategory(false);
+                    setStock('');
+                    setShowStock(false);
                   }}
-                  className={`block w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors ${category === '' ? 'bg-gray-100 font-medium' : ''}`}
+                  className={`block w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors ${stock === '' ? 'bg-gray-100 font-medium' : ''}`}
                 >
-                  All Categories
+                  All
                 </button>
-                {categories.map(c => (
-                  <button
-                    key={c.id}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setCategory(c.id);
-                      setShowCategory(false);
-                    }}
-                    className={`block w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors ${category === c.id ? 'bg-gray-100 font-medium' : ''}`}
-                  >
-                    {c.name}
-                  </button>
-                ))}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setStock('in');
+                    setShowStock(false);
+                  }}
+                  className={`block w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors ${stock === 'in' ? 'bg-gray-100 font-medium' : ''}`}
+                >
+                  In Stock
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setStock('out');
+                    setShowStock(false);
+                  }}
+                  className={`block w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors ${stock === 'out' ? 'bg-gray-100 font-medium' : ''}`}
+                >
+                  Out of Stock
+                </button>
               </div>
             )}
           </div>
@@ -123,11 +116,12 @@ export default function ProductsPage() {
               onClick={(e) => {
                 e.stopPropagation();
                 setShowColor(!showColor);
-                setShowCategory(false);
-                setShowSize(false);
+                setShowStock(false);
               }}
             >
-              {color ? colors.find(c => String(c.id) === color)?.name || 'Color' : 'Color'}
+              {color.length > 0
+                ? color.map(cid => colors.find(c => String(c.id) === cid)?.name).filter(Boolean).join(', ')
+                : 'Color'}
               <FaChevronDown className={`w-3 h-3 transition-transform ${showColor ? 'rotate-180' : ''}`} />
             </button>
             {showColor && (
@@ -137,10 +131,10 @@ export default function ProductsPage() {
               >
                 <button 
                   onClick={() => {
-                    setColor('');
+                    setColor([]);
                     setShowColor(false);
                   }} 
-                  className={`w-6 h-6 rounded-full border flex items-center justify-center ${color === '' ? 'ring-2 ring-black' : 'border-gray-300'} bg-white`}
+                  className={`w-6 h-6 rounded-full border flex items-center justify-center ${color.length === 0 ? 'ring-2 ring-black' : 'border-gray-300'} bg-white`}
                   aria-label="All colors"
                 >
                   <span className="w-3 h-3 rounded-full bg-gray-300 block" />
@@ -148,60 +142,18 @@ export default function ProductsPage() {
                 {colors.map(c => (
                   <button
                     key={c.id}
-                    onClick={() => {
-                      setColor(String(c.id));
-                      setShowColor(false);
+                    onClick={e => {
+                      e.stopPropagation();
+                      setColor(prev =>
+                        prev.includes(String(c.id))
+                          ? prev.filter(id => id !== String(c.id))
+                          : [...prev, String(c.id)]
+                      );
                     }}
-                    className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${color === String(c.id) ? 'ring-2 ring-black' : 'border-transparent'}`}
+                    className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${color.includes(String(c.id)) ? 'ring-2 ring-black' : 'border-transparent'}`}
                     style={{ backgroundColor: c.color }}
                     aria-label={c.name}
                   />
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Size Dropdown */}
-          <div className="relative">
-            <button 
-              className="flex items-center gap-2 px-3 py-2 border rounded bg-white min-w-[80px] hover:bg-gray-50 transition-colors" 
-              onClick={(e) => {
-                e.stopPropagation();
-                setShowSize(!showSize);
-                setShowCategory(false);
-                setShowColor(false);
-              }}
-            >
-              {size ? sizes.find(s => String(s.id) === size)?.name || 'Size' : 'Size'}
-              <FaChevronDown className={`w-3 h-3 transition-transform ${showSize ? 'rotate-180' : ''}`} />
-            </button>
-            {showSize && (
-              <div 
-                className="absolute left-0 top-10 mt-1 border rounded bg-white shadow-lg min-w-[120px] z-20 max-h-60 overflow-y-auto"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setSize('');
-                    setShowSize(false);
-                  }}
-                  className={`block w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors ${size === '' ? 'bg-gray-100 font-medium' : ''}`}
-                >
-                  All Sizes
-                </button>
-                {sizes.map(s => (
-                  <button
-                    key={s.id}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setSize(String(s.id));
-                      setShowSize(false);
-                    }}
-                    className={`block w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors ${size === String(s.id) ? 'bg-gray-100 font-medium' : ''}`}
-                  >
-                    {s.name}
-                  </button>
                 ))}
               </div>
             )}

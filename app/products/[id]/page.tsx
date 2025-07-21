@@ -49,7 +49,10 @@ export default function ProductDetailPage() {
         {/* Product Details */}
         <div>
           <h1 className="text-3xl font-bold mb-2">{product.product_name}</h1>
-          <p className="text-xl font-semibold mb-4">{product.price_inc_vat} NOK</p>
+          <p className="text-xl font-semibold mb-4">
+            {product.price_inc_vat} NOK
+            {!product.in_stock && <span className="ml-4 text-red-500 font-bold">Out of stock</span>}
+          </p>
           <div className="mb-4">
             <span className="font-medium">Color</span>
             <div className="flex gap-2 mt-1">
@@ -100,8 +103,11 @@ export default function ProductDetailPage() {
               </button>
             </div>
             <button
-              className="flex items-center gap-2 bg-black text-white py-2 px-6 rounded-lg text-base font-medium shadow hover:bg-gray-900 transition w-[220px] justify-center"
+              className={`flex items-center gap-2 py-2 px-6 rounded-lg text-base font-medium shadow w-[220px] justify-center
+                ${product.in_stock ? 'bg-black text-white hover:bg-gray-900 transition' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}
+              `}
               onClick={() => {
+                if (!product.in_stock) return;
                 addToCart({
                   productId: product.product_id,
                   colorId: selectedColor,
@@ -111,9 +117,10 @@ export default function ProductDetailPage() {
                 setAdded(true);
                 setTimeout(() => setAdded(false), 1200);
               }}
+              disabled={!product.in_stock}
             >
               <FaShoppingCart className="w-5 h-5" />
-              Add to cart
+              {product.in_stock ? 'Add to cart' : 'Out of stock'}
             </button>
           </div>
           <div className="mt-8">

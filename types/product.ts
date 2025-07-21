@@ -11,6 +11,8 @@ export interface Product {
   product_image: string
   product_thumb_big: string
   product_thumb_small: string
+  in_stock?: boolean // Optional
+  stock_quantity?: number // Optional
   images: Array<{
     product_image: string
     product_thumb_big: string
@@ -38,5 +40,7 @@ export interface Product {
     price_inc_vat: string
     special_price?: string
     product_image: string
+    in_stock?: boolean // Optional
+    stock_quantity?: number // Optional
   }>
 }

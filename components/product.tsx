@@ -7,6 +7,8 @@ import { Product } from '@/types/product';
 import { colors, products } from "../utils/store"
 import Image from 'next/image';
 import { useCart } from "@/context/cartContext";
+import ProductModal from './ProductModal';
+import toast from 'react-hot-toast';
 
 // Helper function to get variant details
 const getVariantDetails = (product: Product, colorId: number | null) => {
@@ -42,6 +44,7 @@ type ProductCardProps = {
   onPrevImage: (productId: string, imagesLength: number) => void;
   onNextImage: (productId: string, imagesLength: number) => void;
   router: ReturnType<typeof useRouter>;
+  onOpenModal: (product: Product, colorId: number) => void;
 };
 
 type ProductListItemProps = {
@@ -52,6 +55,7 @@ type ProductListItemProps = {
   onPrevImage: (productId: string, imagesLength: number) => void;
   onNextImage: (productId: string, imagesLength: number) => void;
   router: ReturnType<typeof useRouter>;
+  onOpenModal: (product: Product, colorId: number) => void;
 };
 
 export default function ProductGrid({ 
@@ -61,6 +65,9 @@ export default function ProductGrid({
 }: ProductGridProps = {}) {
   const router = useRouter();
   const searchParams = useSearchParams();
+
+  // Move useCart here
+  const { addToCart } = useCart();
   
   const [currentImageIndices, setCurrentImageIndices] = useState<Record<string, number>>(
     products.reduce((acc: Record<string, number>, product: Product) => {
@@ -75,6 +82,10 @@ export default function ProductGrid({
       return acc;
     }, {})
   );
+
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalProduct, setModalProduct] = useState<Product | null>(null);
+  const [modalColor, setModalColor] = useState<number | null>(null);
 
   // On mount, update selectedColors from searchParams
   useEffect(() => {
@@ -130,6 +141,17 @@ export default function ProductGrid({
     }));
   };
 
+  const handleOpenModal = (product: Product, colorId: number) => {
+    setModalProduct(product);
+    setModalColor(colorId);
+    setModalOpen(true);
+  };
+
+  const handleAddToCart = ({ productId, colorId, sizeId, quantity }: { productId: string, colorId: number, sizeId: number, quantity: number }) => {
+    addToCart({ productId, colorId, sizeId, quantity });
+    toast.success('Added to cart!');
+  };
+
   const baseProducts = overrideProducts || products;
   const shownProducts = limit ? baseProducts.slice(0, limit) : baseProducts;
 
@@ -148,6 +170,7 @@ export default function ProductGrid({
                 onPrevImage={prevImage}
                 onNextImage={nextImage}
                 router={router}
+                onOpenModal={handleOpenModal}
               />
             ))}
           </div>
@@ -163,11 +186,19 @@ export default function ProductGrid({
                 onPrevImage={prevImage}
                 onNextImage={nextImage}
                 router={router}
+                onOpenModal={handleOpenModal}
               />
             ))}
           </div>
         )}
       </div>
+      <ProductModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        product={modalProduct}
+        selectedColor={modalColor}
+        onAddToCart={handleAddToCart}
+      />
     </section>
   )
 }
@@ -179,37 +210,35 @@ const ProductCard = ({
   onColorSelect, 
   onPrevImage, 
   onNextImage, 
-  router 
+  router,
+  onOpenModal
 }: ProductCardProps) => {
-  const { addToCart } = useCart();
   const variant = getVariantDetails(product, selectedColor);
   const filteredImages = product.images.filter(img => 
     !img.color_id || img.color_id === selectedColor
   );
-
-  const handleAddToCart = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    addToCart({
-      productId: product.product_id,
-      colorId: selectedColor,
-      sizeId: product.sizes[0],
-      quantity: 1
-    });
-  };
 
   return (
     <div 
       className="group cursor-pointer relative hover:shadow-lg transition-shadow duration-200 rounded-lg overflow-hidden" 
       onClick={() => router.push(`/products/${product.product_id}`)}
     >
-      {/* Floating Add to Cart Button */}
+      {/* Add to Cart Button - now opens modal */}
       <button
-        onClick={handleAddToCart}
-        className="absolute top-3 right-3 z-10 bg-white/90 hover:bg-white rounded-full p-2 shadow-md transition-all opacity-0 group-hover:opacity-100 hover:scale-110"
+        onClick={e => { e.stopPropagation(); onOpenModal(product, selectedColor); }}
+        className="group/button absolute top-3 right-3 z-10 bg-white/90 hover:bg-white rounded-lg shadow-md transition-all duration-300 opacity-0 group-hover:opacity-100 hover:scale-105 flex items-center overflow-hidden"
         aria-label="Add to cart"
         title="Add to cart"
       >
-        <FiShoppingBag className="w-4 h-4 text-gray-900" />
+        <div className="p-2 flex items-center justify-center">
+          <FiShoppingBag className="w-4 h-4 text-gray-900 flex-shrink-0" />
+        </div>
+        {/* Text expands only on button hover, not image hover */}
+        <div className="max-w-0 group-hover/button:max-w-[4rem] transition-all duration-300 overflow-hidden">
+          <span className="text-xs font-medium text-gray-900 whitespace-nowrap pr-2">
+            ADD +
+          </span>
+        </div>
       </button>
 
       {/* Image Container */}
@@ -262,6 +291,9 @@ const ProductCard = ({
             </span>
           )}
         </p>
+        {!product.in_stock && (
+          <div className="text-xs text-red-500 font-semibold mt-1">Out of stock</div>
+        )}
 
         {/* Color Swatches */}
         <div className="flex gap-2 pt-1">
@@ -283,8 +315,6 @@ const ProductCard = ({
             );
           })}
         </div>
-
-       
       </div>
     </div>
   );
@@ -297,42 +327,36 @@ const ProductListItem = ({
   onColorSelect, 
   onPrevImage, 
   onNextImage, 
-  router 
+  router,
+  onOpenModal
 }: ProductListItemProps) => {
-  const { addToCart } = useCart();
   const variant = getVariantDetails(product, selectedColor);
   const filteredImages = product.images.filter(img => 
     !img.color_id || img.color_id === selectedColor
   );
-
-  const handleAddToCart = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    addToCart({
-      productId: product.product_id,
-      colorId: selectedColor,
-      sizeId: product.sizes[0],
-      quantity: 1
-    });
-  };
 
   return (
     <div 
       className="flex flex-col sm:flex-row gap-6 group cursor-pointer border-b pb-8 relative hover:bg-gray-50/50 transition-colors duration-200 p-4 rounded-lg"
       onClick={() => router.push(`/products/${product.product_id}`)}
     >
-      {/* Floating Add to Cart Button */}
+      {/* Add to Cart Button - now opens modal */}
       <button
-  onClick={handleAddToCart}
-  className="absolute top-3 right-3 z-10 bg-white/90 hover:bg-white p-2 shadow-md transition-all opacity-0 group-hover:opacity-100 hover:scale-110 flex items-center gap-1 hover:pr-3 hover:pl-2 overflow-hidden"
-  aria-label="Add to cart"
-  title="Add to cart"
->
-  <FiShoppingBag className="w-4 h-4 text-gray-900 flex-shrink-0" />
-  <span className="text-xs font-medium text-gray-900 whitespace-nowrap inline-block opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-    ADD +
-  </span>
-</button>
-
+        onClick={e => { e.stopPropagation(); onOpenModal(product, selectedColor); }}
+        className="group/button absolute top-3 right-3 z-10 bg-white/90 hover:bg-white rounded-lg shadow-md transition-all duration-300 opacity-0 group-hover:opacity-100 hover:scale-105 flex items-center overflow-hidden"
+        aria-label="Add to cart"
+        title="Add to cart"
+      >
+        <div className="p-2 flex items-center justify-center">
+          <FiShoppingBag className="w-4 h-4 text-gray-900 flex-shrink-0" />
+        </div>
+        {/* Text expands only on button hover, not image hover */}
+        <div className="max-w-0 group-hover/button:max-w-[4rem] transition-all duration-300 overflow-hidden">
+          <span className="text-xs font-medium text-gray-900 whitespace-nowrap pr-2">
+            ADD +
+          </span>
+        </div>
+      </button>
 
       {/* Image Container */}
       <div className="relative w-full sm:w-1/3 aspect-[4/5] bg-gray-100 overflow-hidden rounded-lg">
@@ -384,6 +408,9 @@ const ProductListItem = ({
             </span>
           )}
         </p>
+        {!product.in_stock && (
+          <div className="text-xs text-red-500 font-semibold mb-1">Out of stock</div>
+        )}
 
         <p className="text-sm text-gray-600 mb-4 line-clamp-3">
           {product.description || 'No description available'}
