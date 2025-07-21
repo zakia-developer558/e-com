@@ -20,7 +20,7 @@ export default function Hero() {
 
           {/* CTA Button */}
           <Link
-            href="/shop"
+            href="/products"
             className="inline-block px-4 py-3 text-white border-1 border-white rounded-xl text-lg font-medium hover:bg-white/10 hover:text-white transition-colors duration-300"
           >
             Shop now
