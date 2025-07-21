@@ -322,13 +322,17 @@ const ProductListItem = ({
     >
       {/* Floating Add to Cart Button */}
       <button
-        onClick={handleAddToCart}
-        className="absolute top-3 right-3 z-10 bg-white/90 hover:bg-white rounded-full p-2 shadow-md transition-all opacity-0 group-hover:opacity-100 hover:scale-110"
-        aria-label="Add to cart"
-        title="Add to cart"
-      >
-        <FiShoppingBag className="w-4 h-4 text-gray-900" />
-      </button>
+  onClick={handleAddToCart}
+  className="absolute top-3 right-3 z-10 bg-white/90 hover:bg-white p-2 shadow-md transition-all opacity-0 group-hover:opacity-100 hover:scale-110 flex items-center gap-1 hover:pr-3 hover:pl-2 overflow-hidden"
+  aria-label="Add to cart"
+  title="Add to cart"
+>
+  <FiShoppingBag className="w-4 h-4 text-gray-900 flex-shrink-0" />
+  <span className="text-xs font-medium text-gray-900 whitespace-nowrap inline-block opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+    ADD +
+  </span>
+</button>
+
 
       {/* Image Container */}
       <div className="relative w-full sm:w-1/3 aspect-[4/5] bg-gray-100 overflow-hidden rounded-lg">

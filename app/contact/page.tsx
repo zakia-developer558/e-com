@@ -23,7 +23,7 @@ export default function ContactPage() {
       });
       if (!res.ok) throw new Error('Failed to send email');
       setSubmitted(true);
-    } catch {
+    } catch (err) {
       setError('Failed to send message. Please try again.');
     } finally {
       setLoading(false);
