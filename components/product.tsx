@@ -11,7 +11,7 @@ import ProductModal from './ProductModal';
 import toast from 'react-hot-toast';
 
 // Helper function to get variant details
-const getVariantDetails = (product: Product, colorId: number | null) => {
+export const getVariantDetails = (product: Product, colorId: number | null) => {
   if (!colorId || !product.color_variants) return product;
   
   const variant = product.color_variants.find(v => v.color_id === colorId);

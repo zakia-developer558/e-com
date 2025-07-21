@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { FiX, FiShoppingBag } from 'react-icons/fi';
 import { Product } from '@/types/product';
 import { sizes } from '../utils/store';
+import { getVariantDetails } from './product';
 
 interface ProductModalProps {
   open: boolean;
@@ -25,9 +26,12 @@ const ProductModal: React.FC<ProductModalProps> = ({ open, onClose, product, sel
 
   // Only render modal if open and product/selectedColor are set
   if (!open || !product || !selectedColor) return null;
-  const productImage = product.product_image;
-  const price = product.price_inc_vat;
-  const specialPrice = product.special_price;
+
+  // Use variant details for selected color
+  const variant = getVariantDetails(product, selectedColor);
+  const productImage = variant.product_image;
+  const price = variant.price_inc_vat;
+  const specialPrice = variant.special_price;
 
   return (
     <div className={`fixed inset-0 z-50 flex items-center justify-center ${open ? '' : 'pointer-events-none'}`}>
@@ -58,7 +62,6 @@ const ProductModal: React.FC<ProductModalProps> = ({ open, onClose, product, sel
         <div className="md:w-1/2 w-full p-6 flex flex-col gap-4">
           <h2 className="text-2xl font-bold mb-2">{product.product_name}</h2>
           <div className="text-lg font-semibold text-gray-900 mb-2">{price} NOK {specialPrice && <span className="ml-2 text-red-500 line-through">{specialPrice} NOK</span>}</div>
-          <div className="text-gray-600 mb-2">{product.description}</div>
           {/* Size Selection */}
           <div className="mb-2">
             <div className="font-medium mb-1">Size</div>
@@ -80,41 +83,58 @@ const ProductModal: React.FC<ProductModalProps> = ({ open, onClose, product, sel
           </div>
           {/* Quantity Selector */}
           <div className="mb-4 flex items-center gap-3">
-            <div className="font-medium">Quantity</div>
+            <div className="flex items-center rounded-lg border border-gray-200 bg-white px-2 h-12">
+              <button
+                className="w-8 h-8 rounded-lg flex items-center justify-center text-lg font-bold disabled:opacity-50"
+                onClick={() => setQuantity(q => Math.max(1, q - 1))}
+                disabled={quantity <= 1}
+                aria-label="Decrease quantity"
+              >
+                –
+              </button>
+              <span className="w-8 text-center text-base">{quantity}</span>
+              <button
+                className="w-8 h-8 rounded-lg flex items-center justify-center text-lg font-bold"
+                onClick={() => setQuantity(q => q + 1)}
+                aria-label="Increase quantity"
+              >
+                +
+              </button>
+            </div>
             <button
-              className="w-8 h-8 rounded border flex items-center justify-center text-lg font-bold disabled:opacity-50"
-              onClick={() => setQuantity(q => Math.max(1, q - 1))}
-              disabled={quantity <= 1}
-              aria-label="Decrease quantity"
+              className="h-12 min-w-[160px] px-6 bg-black text-white rounded-lg text-base font-semibold flex items-center justify-center gap-2 hover:bg-gray-900 transition"
+              onClick={() => {
+                if (selectedSize) {
+                  onAddToCart({
+                    productId: product.product_id,
+                    colorId: selectedColor,
+                    sizeId: selectedSize,
+                    quantity,
+                  });
+                  onClose();
+                }
+              }}
+              disabled={!selectedSize}
             >
-              -
-            </button>
-            <span className="w-8 text-center">{quantity}</span>
-            <button
-              className="w-8 h-8 rounded border flex items-center justify-center text-lg font-bold"
-              onClick={() => setQuantity(q => q + 1)}
-              aria-label="Increase quantity"
-            >
-              +
+              <FiShoppingBag className="w-5 h-5" /> Add to cart
             </button>
           </div>
-          {/* Add to Cart Button */}
+          {/* Shop Pay Button */}
           <button
-            className="w-full bg-black text-white py-3 rounded-lg text-lg font-semibold flex items-center justify-center gap-2 hover:bg-gray-900 transition"
-            onClick={() => {
-              if (selectedSize) {
-                onAddToCart({
-                  productId: product.product_id,
-                  colorId: selectedColor,
-                  sizeId: selectedSize,
-                  quantity,
-                });
-                onClose();
-              }
-            }}
-            disabled={!selectedSize}
+            className="w-full bg-[#5a31f4] hover:bg-[#4b27c9] text-white font-semibold py-2 rounded-lg text-lg flex items-center justify-center gap-2 transition"
           >
-            <FiShoppingBag className="w-5 h-5" /> Add to cart
+            Buy with
+            <span className="bg-white text-[#5a31f4] font-bold px-2 py-1 rounded ml-2 flex items-center gap-1">
+              shop
+              <span className="bg-[#5a31f4] text-white rounded px-1 ml-1 text-xs font-bold">Pay</span>
+            </span>
+          </button>
+          {/* More payment options link */}
+          <button
+            className="w-full text-gray-600 underline text-sm hover:text-black transition"
+            style={{ textAlign: 'center' }}
+          >
+            More payment options
           </button>
         </div>
       </div>

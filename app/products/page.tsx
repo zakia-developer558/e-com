@@ -22,6 +22,7 @@ export default function ProductsPage() {
   const [color, setColor] = useState<string[]>([]);
   const [view, setView] = useState<'grid' | 'list'>('grid');
   const [showColor, setShowColor] = useState(false);
+  const [showSort, setShowSort] = useState(false);
   const sortRef = useRef<HTMLDivElement>(null);
 
   // Filtering
@@ -43,6 +44,7 @@ export default function ProductsPage() {
     if (sortRef.current && !sortRef.current.contains(e.target as Node)) {
       setShowStock(false);
       setShowColor(false);
+      setShowSort(false);
     }
   };
 
@@ -58,23 +60,23 @@ export default function ProductsPage() {
       <h1 className="text-3xl font-bold mb-8">Our Products</h1>
       
       <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
-        {/* Filters */}
+        {/* Filters (left) */}
         <div className="flex gap-2 flex-wrap items-center">
-          {/* Stock Dropdown */}
+          {/* Availability Dropdown */}
           <div className="relative" ref={sortRef}>
             <button 
-              className="flex items-center gap-2 px-3 py-2 border rounded bg-white min-w-[120px] hover:bg-gray-50 transition-colors" 
+              className="flex justify-between items-center gap-2 px-3 py-2 rounded bg-white w-[140px] hover:bg-gray-50 transition-colors" 
               onClick={(e) => {
                 e.stopPropagation();
                 setShowStock(!showStock);
                 setShowColor(false);
               }}
             >
-              {stock === 'in' ? 'In Stock' : stock === 'out' ? 'Out of Stock' : 'Stock'}
-              <FaChevronDown className={`w-3 h-3 transition-transform ${showStock ? 'rotate-180' : ''}`} />
+              <span>{stock === 'in' ? 'In Stock' : stock === 'out' ? 'Out of Stock' : 'Availability'}</span>
+              <FaChevronDown className={`w-3 h-3 ml-auto transition-transform ${showStock ? 'rotate-180' : ''}`} />
             </button>
             {showStock && (
-              <div className="absolute left-0 top-10 mt-1 border rounded bg-white shadow-lg min-w-[160px] z-20">
+              <div className="absolute left-0 top-10 mt-1 bg-white shadow-lg rounded min-w-[160px] z-20">
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
@@ -112,21 +114,34 @@ export default function ProductsPage() {
           {/* Color Dropdown */}
           <div className="relative">
             <button 
-              className="flex items-center gap-2 px-3 py-2 border rounded bg-white min-w-[100px] hover:bg-gray-50 transition-colors" 
+              className="flex justify-between items-center gap-2 px-3 py-2 rounded bg-white w-[120px] hover:bg-gray-50 transition-colors" 
               onClick={(e) => {
                 e.stopPropagation();
                 setShowColor(!showColor);
                 setShowStock(false);
+                setShowSort(false);
               }}
             >
-              {color.length > 0
-                ? color.map(cid => colors.find(c => String(c.id) === cid)?.name).filter(Boolean).join(', ')
-                : 'Color'}
-              <FaChevronDown className={`w-3 h-3 transition-transform ${showColor ? 'rotate-180' : ''}`} />
+              <span className="flex items-center gap-1">
+                {color.length > 0
+                  ? color.map((cid, idx) => {
+                      const c = colors.find(col => String(col.id) === cid);
+                      if (!c) return null;
+                      return (
+                        <span
+                          key={c.id}
+                          className={`inline-block w-5 h-5 rounded-full border ${idx !== 0 ? '-ml-3' : ''}`}
+                          style={{ backgroundColor: c.color, border: '2px solid #fff', zIndex: 10 + idx }}
+                        />
+                      );
+                    })
+                  : 'Color'}
+              </span>
+              <FaChevronDown className={`w-3 h-3 ml-auto transition-transform ${showColor ? 'rotate-180' : ''}`} />
             </button>
             {showColor && (
               <div 
-                className="absolute left-0 top-10 mt-1 bg-white border rounded shadow-lg min-w-[160px] z-20 p-3 grid grid-cols-4 gap-2"
+                className="absolute left-0 top-10 mt-1 bg-white shadow-lg rounded min-w-[160px] z-20 p-3 grid grid-cols-4 gap-2"
                 onClick={(e) => e.stopPropagation()}
               >
                 <button 
@@ -160,20 +175,42 @@ export default function ProductsPage() {
           </div>
         </div>
 
-        {/* Sort and View Options */}
+        {/* Sort and View Options (right) */}
         <div className="flex items-center gap-4">
           <span className="text-gray-500 text-sm">{filtered.length} {filtered.length === 1 ? 'item' : 'items'}</span>
-          
-          <select 
-            value={sort} 
-            onChange={e => setSort(e.target.value)} 
-            className="border rounded px-3 py-2 min-w-[180px] bg-white hover:bg-gray-50 transition-colors cursor-pointer"
-          >
-            {sortOptions.map(opt => (
-              <option key={opt.value} value={opt.value}>{opt.label}</option>
-            ))}
-          </select>
-          
+          {/* Sort Dropdown */}
+          <div className="relative">
+            <button
+              className="flex justify-between items-center gap-2 px-3 py-2 rounded bg-white w-[120px] hover:bg-gray-50 transition-colors"
+              onClick={e => {
+                e.stopPropagation();
+                setShowSort(!showSort);
+                setShowStock(false);
+                setShowColor(false);
+              }}
+            >
+              <span>Sort</span>
+              <FaChevronDown className={`w-3 h-3 ml-auto transition-transform ${showSort ? 'rotate-180' : ''}`} />
+            </button>
+            {showSort && (
+              <div className="absolute left-0 top-10 mt-1 bg-white shadow-lg rounded min-w-[180px] z-20">
+                {sortOptions.map(opt => (
+                  <button
+                    key={opt.value}
+                    onClick={e => {
+                      e.stopPropagation();
+                      setSort(opt.value);
+                      setShowSort(false);
+                    }}
+                    className={`block w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors ${sort === opt.value ? 'bg-gray-100 font-medium' : ''}`}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+          {/* View Options */}
           <div className="flex items-center gap-1 bg-gray-100 p-1 rounded">
             <button 
               className={`p-2 rounded transition-colors ${view === 'grid' ? 'bg-black text-white' : 'hover:bg-gray-200 text-gray-700'}`} 
