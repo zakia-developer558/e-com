@@ -1,5 +1,5 @@
 "use client"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useRouter, useSearchParams } from 'next/navigation';
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa"
 import { FiShoppingBag } from "react-icons/fi"
@@ -65,6 +65,7 @@ export default function ProductGrid({
 }: ProductGridProps = {}) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const isInitialMount = useRef(true);
 
   // Move useCart here
   const { addToCart } = useCart();
@@ -87,29 +88,37 @@ export default function ProductGrid({
   const [modalProduct, setModalProduct] = useState<Product | null>(null);
   const [modalColor, setModalColor] = useState<number | null>(null);
 
-  // On mount, update selectedColors from searchParams
+  // On mount, update selectedColors from searchParams only if they exist
   useEffect(() => {
     if (typeof window === 'undefined') return;
+    
     setSelectedColors(prev => {
       const updated: Record<string, number> = { ...prev };
+      let hasUpdates = false;
+      
       products.forEach(product => {
         const colorParam = searchParams.get(`color_${product.product_id}`);
         if (colorParam) {
           updated[product.product_id] = Number(colorParam);
+          hasUpdates = true;
         }
       });
-      return updated;
+      
+      // Only update if there were actual URL parameters
+      return hasUpdates ? updated : prev;
     });
+    
+    isInitialMount.current = false;
   }, [searchParams]);
   
-  // Update URL when color changes
-  useEffect(() => {
-    Object.keys(selectedColors).forEach(productId => {
-      const params = new URLSearchParams(searchParams?.toString() || '');
-      params.set(`color_${productId}`, selectedColors[productId].toString());
-      router.replace(`?${params.toString()}`, { scroll: false });
-    });
-  }, [selectedColors, router, searchParams]);
+  // Only update URL when colors are explicitly changed by user (not on initial load)
+  const updateURL = (productId: string, colorId: number) => {
+    if (isInitialMount.current) return;
+    
+    const params = new URLSearchParams(searchParams?.toString() || '');
+    params.set(`color_${productId}`, colorId.toString());
+    router.replace(`?${params.toString()}`, { scroll: false });
+  };
 
   const nextImage = (productId: string, imagesLength: number) => {
     setCurrentImageIndices(prev => ({
@@ -131,9 +140,8 @@ export default function ProductGrid({
       [productId]: colorId
     }));
     
-    const params = new URLSearchParams(searchParams?.toString() || '');
-    params.set(`color_${productId}`, colorId.toString());
-    router.replace(`?${params.toString()}`, { scroll: false });
+    // Only update URL if this is a user action (not initial load)
+    updateURL(productId, colorId);
     
     setCurrentImageIndices(prev => ({
       ...prev,

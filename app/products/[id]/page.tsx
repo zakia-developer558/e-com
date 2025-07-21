@@ -103,11 +103,8 @@ export default function ProductDetailPage() {
               </button>
             </div>
             <button
-              className={`flex items-center gap-2 py-2 px-6 rounded-lg text-base font-medium shadow w-[220px] justify-center
-                ${product.in_stock ? 'bg-black text-white hover:bg-gray-900 transition' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}
-              `}
+              className="flex items-center gap-2 bg-black text-white py-2 px-6 rounded-lg text-base font-medium shadow hover:bg-gray-900 transition w-[220px] justify-center"
               onClick={() => {
-                if (!product.in_stock) return;
                 addToCart({
                   productId: product.product_id,
                   colorId: selectedColor,
@@ -117,10 +114,17 @@ export default function ProductDetailPage() {
                 setAdded(true);
                 setTimeout(() => setAdded(false), 1200);
               }}
-              disabled={!product.in_stock}
+              disabled={added}
             >
-              <FaShoppingCart className="w-5 h-5" />
-              {product.in_stock ? 'Add to cart' : 'Out of stock'}
+              {added ? (
+                <>
+                  <span className="text-green-400 font-bold text-lg">✓</span> Added
+                </>
+              ) : (
+                <>
+                  <FaShoppingCart className="w-5 h-5" /> Add to cart
+                </>
+              )}
             </button>
           </div>
           <div className="mt-8">

@@ -16,6 +16,7 @@ interface ProductModalProps {
 const ProductModal: React.FC<ProductModalProps> = ({ open, onClose, product, selectedColor, onAddToCart }) => {
   const [selectedSize, setSelectedSize] = useState<number | null>(null);
   const [quantity, setQuantity] = useState(1);
+  const [added, setAdded] = useState(false);
 
   // Always call hooks first!
   React.useEffect(() => {
@@ -111,12 +112,22 @@ const ProductModal: React.FC<ProductModalProps> = ({ open, onClose, product, sel
                     sizeId: selectedSize,
                     quantity,
                   });
+                  setAdded(true);
+                  setTimeout(() => setAdded(false), 1200);
                   onClose();
                 }
               }}
-              disabled={!selectedSize}
+              disabled={!selectedSize || added}
             >
-              <FiShoppingBag className="w-5 h-5" /> Add to cart
+              {added ? (
+                <>
+                  <span className="text-green-400 font-bold text-lg">✓</span> Added
+                </>
+              ) : (
+                <>
+                  <FiShoppingBag className="w-5 h-5" /> Add to cart
+                </>
+              )}
             </button>
           </div>
           {/* Shop Pay Button */}

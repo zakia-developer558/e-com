@@ -65,7 +65,7 @@ export default function ProductsPage() {
           {/* Availability Dropdown */}
           <div className="relative" ref={sortRef}>
             <button 
-              className="flex justify-between items-center gap-2 px-3 py-2 rounded bg-white w-[140px] hover:bg-gray-50 transition-colors" 
+              className="flex items-center gap-2 px-3 py-2 rounded w-[140px] transition-colors" 
               onClick={(e) => {
                 e.stopPropagation();
                 setShowStock(!showStock);
@@ -73,7 +73,7 @@ export default function ProductsPage() {
               }}
             >
               <span>{stock === 'in' ? 'In Stock' : stock === 'out' ? 'Out of Stock' : 'Availability'}</span>
-              <FaChevronDown className={`w-3 h-3 ml-auto transition-transform ${showStock ? 'rotate-180' : ''}`} />
+              <FaChevronDown className={`w-3 h-3 transition-transform ${showStock ? 'rotate-180' : ''}`} />
             </button>
             {showStock && (
               <div className="absolute left-0 top-10 mt-1 bg-white shadow-lg rounded min-w-[160px] z-20">
@@ -97,16 +97,16 @@ export default function ProductsPage() {
                 >
                   In Stock
                 </button>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
                     setStock('out');
                     setShowStock(false);
-                  }}
+                    }}
                   className={`block w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors ${stock === 'out' ? 'bg-gray-100 font-medium' : ''}`}
-                >
+                  >
                   Out of Stock
-                </button>
+                  </button>
               </div>
             )}
           </div>
@@ -114,7 +114,7 @@ export default function ProductsPage() {
           {/* Color Dropdown */}
           <div className="relative">
             <button 
-              className="flex justify-between items-center gap-2 px-3 py-2 rounded bg-white w-[120px] hover:bg-gray-50 transition-colors" 
+              className="flex items-center gap-2 px-3 py-2 rounded w-[120px] transition-colors" 
               onClick={(e) => {
                 e.stopPropagation();
                 setShowColor(!showColor);
@@ -137,7 +137,7 @@ export default function ProductsPage() {
                     })
                   : 'Color'}
               </span>
-              <FaChevronDown className={`w-3 h-3 ml-auto transition-transform ${showColor ? 'rotate-180' : ''}`} />
+              <FaChevronDown className={`w-3 h-3 transition-transform ${showColor ? 'rotate-180' : ''}`} />
             </button>
             {showColor && (
               <div 
@@ -173,15 +173,15 @@ export default function ProductsPage() {
               </div>
             )}
           </div>
-        </div>
+          </div>
 
         {/* Sort and View Options (right) */}
         <div className="flex items-center gap-4">
           <span className="text-gray-500 text-sm">{filtered.length} {filtered.length === 1 ? 'item' : 'items'}</span>
           {/* Sort Dropdown */}
           <div className="relative">
-            <button
-              className="flex justify-between items-center gap-2 px-3 py-2 rounded bg-white w-[120px] hover:bg-gray-50 transition-colors"
+            <button 
+              className="flex items-center gap-2 px-3 py-2 rounded w-[120px] transition-colors"
               onClick={e => {
                 e.stopPropagation();
                 setShowSort(!showSort);
@@ -190,7 +190,7 @@ export default function ProductsPage() {
               }}
             >
               <span>Sort</span>
-              <FaChevronDown className={`w-3 h-3 ml-auto transition-transform ${showSort ? 'rotate-180' : ''}`} />
+              <FaChevronDown className={`w-3 h-3 transition-transform ${showSort ? 'rotate-180' : ''}`} />
             </button>
             {showSort && (
               <div className="absolute left-0 top-10 mt-1 bg-white shadow-lg rounded min-w-[180px] z-20">
